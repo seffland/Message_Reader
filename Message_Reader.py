@@ -4,7 +4,7 @@ import time
 
 
 def start(argument):
-    print "Starting fortran program with " + argument
+    print "Starting fortran program with ", ": ".join(argument)
 
 path_to_watch = "C:/Users/seffl_000/Documents/WORK/Message-Reader/"
 before = dict([(f, None) for f in os.listdir(path_to_watch)])
