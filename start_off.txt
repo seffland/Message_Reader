@@ -1,0 +1,75 @@
+# This procedure sets up the geqdis system for operations
+# The parameter is either synthetic or operational
+#
+# First we define the loop parameters, which determine the earthquakes to be considered
+#
+rm set_loop_parameters.pro
+#
+# We set the first and last event we will consider:
+#
+# For Sumatra 2004:
+# echo 'equal $s=10000' > set_loop_parameters.pro
+# echo 'equal $e=10000' >> set_loop_parameters.pro
+#
+# For Chile 2010:
+# echo 'equal $s=30' > set_loop_parameters.pro
+# echo 'equal $e=30' >> set_loop_parameters.pro
+#
+# For Japan 2011:
+echo 'equal $s=118' > set_loop_parameters.pro
+echo 'equal $e=118' >> set_loop_parameters.pro
+#
+# For Sumatra 2012/04/11
+#
+# echo 'equal $s=303' > set_loop_parameters.pro
+# echo 'equal $e=303' >> set_loop_parameters.pro
+# echo 'equal $e=306' >> set_loop_parameters.pro
+#
+# For Philippines 2012/08/31
+#
+# echo 'equal $s=369' > set_loop_parameters.pro
+# echo 'equal $e=369' >> set_loop_parameters.pro
+# echo 'equal $e=370' >> set_loop_parameters.pro
+#
+# For Scotia Sea, 2013/11/17
+#
+# echo 'equal $s=483' > set_loop_parameters.pro
+# echo 'equal $e=483' >> set_loop_parameters.pro
+#
+# For Tarapaca, Chile 2014/03/16
+#
+# echo 'equal $s=492' > set_loop_parameters.pro
+# echo 'equal $e=492' >> set_loop_parameters.pro
+#
+# For Mexico 2014/07/07
+#
+# echo 'equal $s=607' > set_loop_parameters.pro
+# echo 'equal $e=607' >> set_loop_parameters.pro
+#
+# We delete all event files, we assume names that need to be used in the 
+# respective *.pro files
+#
+rm *event.txt
+rm gnss_request.txt
+rm *_message
+rm *_solution_pars.dat
+#
+# Then we remove all timeseries file 
+#
+rm timeseries/*.dat
+#
+# Now we start gnss_server first ...
+#
+gnss_server < gnss_server_ts.pro > gnss_server.lis | grep 'Request detected' gnss_server.lis & 
+#
+# ... then we start geqdis ...
+#
+geqdis < geqdis_operational.pro > geqdis.lis | grep 'Displacement field available' geqdis.lis &
+# geqdis < geqdis_operational.pro > geqdis.lis | more geqdis.lis &
+#
+# ... and finally we add earthquake - the variable determines whether this is operational or for 
+# a synthetic earthquake
+#
+earthquake < earthquake_$1.pro > earthquake.lis | grep 'Event detected' earthquake.lis &
+
+
