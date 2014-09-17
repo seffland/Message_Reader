@@ -19,6 +19,7 @@ def ConfigSectionMap(section):
 
 def start(argument):
     print "Starting fortran program with ", ": ".join(argument)
+    #TODO insert fortran argument here
 
 
 def newalertcheck(list, new):
@@ -53,7 +54,6 @@ def startresearch():
 
     start = int(raw_input("Starting file: "))
     end = int(raw_input("Ending file: "))
-    print ("end - start ="), (end - start)
     if (end - start) > maxprocnum:
         print("Too many files to proccess")
     elif (end - start) < maxprocnum:
@@ -61,8 +61,9 @@ def startresearch():
 
 #Config file setup
 Config = ConfigParser.ConfigParser()
-configfile = "C:\Users\seffl_000\Documents\WORK\Message-Reader\config.ini"
+configfile = "C:\Users\seffl_000\Documents\Message_Reader\config.ini"
 Config.read(configfile)
+
 
 mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
 if mode == "O" or mode == "o":
