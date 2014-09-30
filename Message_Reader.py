@@ -3,6 +3,7 @@ import os.path
 import time
 import ConfigParser
 
+
 #Built in config funct
 def ConfigSectionMap(section):
     dict1 = {}
@@ -17,6 +18,7 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
+
 def start(argument):
     print "Starting fortran program with ", ": ".join(argument)
     #TODO insert fortran argument here
@@ -29,6 +31,19 @@ def newalertcheck(list, new):
     else:
         return False
 
+
+def createdir(filename):
+    file = open(filename[0])
+    lines = file.readlines()
+    if lines[1][0:11] == "\EARTHQUAKE":
+        path = lines[1][12:]
+        print "/home/seffland/operational/" + path
+        return True
+    else:
+        return False
+
+
+#Starts operational mode, which listens for new alert files then starts the fortran programs
 def startoperational():
     path_to_watch = ConfigSectionMap("File Options")['path']
     filelist = []
@@ -43,6 +58,7 @@ def startoperational():
         newfile = [f for f in after if not f in before]
         if newfile:
             if newalertcheck(filelist, newfile):
+                createdir(newfile)
                 print "new alert: ", ", ".join(newfile)
                 start(newfile)
         before = after
