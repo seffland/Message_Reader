@@ -1,5 +1,5 @@
 __author__ = 'Steven Effland'
-import os.path
+import os
 import time
 import ConfigParser
 
@@ -26,18 +26,30 @@ def start(argument):
 
 def newalertcheck(list, new):
     test = new[0]
-    if test > max(list):
+    if not list:
+        return True
+    elif test > max(list):
         return True
     else:
         return False
 
 
 def createdir(filename):
-    file = open(filename[0])
+    filepath = "/home/seffland/alerts/" + filename[0]
+    file = open(filepath)
     lines = file.readlines()
     if lines[1][0:11] == "\EARTHQUAKE":
+        operationalpath = "/home/seffland/operational/"
+        eqlist = []
+        for folder in os.listdir(operationalpath):
+            eqlist.append(folder)
         path = lines[1][12:]
-        print "/home/seffland/operational/" + path
+        if path in eqlist:
+            print "Earthquake already exists"
+            return False
+        else:
+            path = "/home/seffland/operational/" + path
+            os.makedirs(path)
         return True
     else:
         return False
@@ -77,7 +89,7 @@ def startresearch():
 
 #Config file setup
 Config = ConfigParser.ConfigParser()
-configfile = "C:\Users\seffl_000\Documents\Message_Reader\config.ini"
+configfile = "/home/seffland/Work/Message_Reader/config.ini"
 Config.read(configfile)
 
 
