@@ -4,7 +4,7 @@ import time
 import ConfigParser
 import psutil
 
-#Built in config funct
+# Built in config funct
 def ConfigSectionMap(section):
     dict1 = {}
     options = Config.options(section)
@@ -18,19 +18,21 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
+
 def checkCPU(baseCPU):
-    runningCPU = psutil.cpu_percent(interval = 1)
+    runningCPU = psutil.cpu_percent(interval=1)
     proccessCPU = runningCPU - baseCPU
-    if runningCPU+proccessCPU<100:
+    if runningCPU + proccessCPU < 100:
         return True
     else:
         return False
 
+
 def start(filename):
     print "Starting fortran program with ", ": ".join(filename)
-    baseCPU = psutil.cpu_percent(interval = 1)
-    #TODO insert fortran argument here
-    #os.system("cd " + filename + "/")
+    baseCPU = psutil.cpu_percent(interval=1)
+    # TODO insert fortran argument here
+    # os.system("cd " + filename + "/")
     #os.system(rm set_loop_parameters.pro)
     #os.system(rm *event.txt)
     #os.system(rm gnss_request.txt)
@@ -43,6 +45,7 @@ def start(filename):
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
+
 def newalertcheck(list, new):
     test = new[0]
     if test > max(list):
@@ -50,12 +53,51 @@ def newalertcheck(list, new):
     else:
         return False
 
+
+def readfile(filename, name, eqtime, lat, long, depth, magnitute):
+    file = ''.join(filename)
+    f = open(ConfigSectionMap("File Options")['path'] + "/" + file)
+    junk = f.readline()
+    newname = f.readline()
+    newname = newname[1:]
+    if newname in name:
+        return False
+    else:
+        name.extend(newname)
+    newtime = f.readline()
+    newtime = newtime[1:]
+
+    newlat = f.readline()
+    newlat = newlat[1:]
+
+    newlong = f.readline()
+    newlong = newlong[1:]
+
+    newdepth = f.readline()
+    newdepth = newdepth[1:]
+
+    newmag = f.readline()
+    newmag = newmag[1:]
+
+    print newname + "\n" + newtime + "\n" + newlat + "\n" + newlong + "\n" + newdepth + "\n" + newmag
+
+    return True
+
+
 def startoperational():
     path_to_watch = ConfigSectionMap("File Options")['path']
     filelist = []
-    #Creates list of files in path
+    # Creates list of files in path
     for file in os.listdir(path_to_watch):
         filelist.append(file[0:3])
+
+    #Make list of Earthquake elements
+    name = []
+    eqtime = []
+    lat = []
+    long = []
+    depth = []
+    magnitute =[]
 
     before = dict([(f, None) for f in os.listdir(path_to_watch)])
     while 1:
@@ -63,9 +105,10 @@ def startoperational():
         after = dict([(f, None) for f in os.listdir(path_to_watch)])
         newfile = [f for f in after if not f in before]
         if newfile:
-            if newalertcheck(filelist, newfile):
-                print "new alert: ", ", ".join(newfile)
-                start(newfile)
+            if readfile(newfile, name, eqtime, lat, long, depth, magnitute):
+                if newalertcheck(filelist, newfile):
+                    print "new alert: ", ", ".join(newfile)
+                    start(newfile)
         before = after
 
 
@@ -80,14 +123,14 @@ def startresearch():
     elif (end - start) < maxprocnum:
         print("Starting fortran program from file:"), str(start) + "_alert.txt", ("to"), str(end) + "_alert.txt"
 
-#Config file setup
+# Config file setup
 Config = ConfigParser.ConfigParser()
 configfile = "/home/seffland/config.ini"
 Config.read(configfile)
 
-#gets cpu percentage
+# gets cpu percentage
 #Use to monitor cpu consumption
-	#print(psutil.cpu_percent(interval=1))
+#print(psutil.cpu_percent(interval=1))
 
 mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
 if mode == "O" or mode == "o":
