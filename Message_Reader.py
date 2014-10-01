@@ -44,6 +44,7 @@ def createdir(filename):
         for folder in os.listdir(operationalpath):
             eqlist.append(folder)
         path = lines[1][12:]
+        path = path.rstrip()
         if path in eqlist:
             print "Earthquake already exists"
             return False
@@ -70,9 +71,9 @@ def startoperational():
         newfile = [f for f in after if not f in before]
         if newfile:
             if newalertcheck(filelist, newfile):
-                createdir(newfile)
-                print "new alert: ", ", ".join(newfile)
-                start(newfile)
+                if createdir(newfile):
+                    print "new alert: ", ", ".join(newfile)
+                    start(newfile)
         before = after
 
 
