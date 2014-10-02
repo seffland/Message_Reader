@@ -3,6 +3,8 @@ import os.path
 import time
 import ConfigParser
 import psutil
+import datetime
+import math
 
 # Built in config funct
 def ConfigSectionMap(section):
@@ -54,32 +56,72 @@ def newalertcheck(list, new):
         return False
 
 
-def readfile(filename, name, eqtime, lat, long, depth, magnitute):
+def timematch(newtime, eqtime):
+    for item in eqtime:
+        if (abs(item - newtime) < float(ConfigSectionMap("Earthquake Options")['delta_eptime'])):
+            return True
+    return False
+
+
+def latlongmatch(newlatlong, latlonglist):
+    for item in latlonglist:
+        if (abs(item - newlatlong) < (float(ConfigSectionMap("Earthquake Options")['delta_latlong'])*math.cos(newlatlong))):
+            return True
+    return False
+
+def depthmatch(newdepth, depthlist):
+    for item in depthlist:
+        if (abs(item - newdepth) < float(ConfigSectionMap("Earthquake Options")['delta_depth'])):
+            return True
+    return False
+
+def newalert(filename, name, eqtime, lat, long, depth, magnitute):
     file = ''.join(filename)
     f = open(ConfigSectionMap("File Options")['path'] + "/" + file)
     junk = f.readline()
+
     newname = f.readline()
-    newname = newname[1:]
+    newname = newname[12:]
     if newname in name:
         return False
     else:
         name.extend(newname)
-    newtime = f.readline()
-    newtime = newtime[1:]
 
-    newlat = f.readline()
-    newlat = newlat[1:]
+    temptime = f.readline()
+    temptime = temptime[6:]
+    year, month, day, hour, min, second = temptime.split("/")
+    newtime = datetime.datetime(int(year), int(month), int(day), int(hour), int(min), int(second))
 
-    newlong = f.readline()
-    newlong = newlong[1:]
+    templat = f.readline()
+    templat = templat[12:]
+    newlat = float(templat)
 
-    newdepth = f.readline()
-    newdepth = newdepth[1:]
+    templong = f.readline()
+    templong = templong[12:]
+    newlong = float(templong)
 
-    newmag = f.readline()
-    newmag = newmag[1:]
+    tempdepth = f.readline()
+    tempdepth = tempdepth[13:]
+    newdepth = float(tempdepth)
 
-    print newname + "\n" + newtime + "\n" + newlat + "\n" + newlong + "\n" + newdepth + "\n" + newmag
+    tempmag = f.readline()
+    tempmag = tempmag[12:]
+    newmag = float(tempmag)
+
+    if timematch(newtime, eqtime) and latlongmatch(newlat, lat) and latlongmatch(newlong, long) and depthmatch(newdepth, depth):
+        return False
+    else:
+        eqtime.append(newtime)
+        lat.append(newlat)
+        long.append(newlong)
+        depth.append(newdepth)
+
+    print newname
+    print newtime
+    print newlat
+    print newlong
+    print newdepth
+    print newmag
 
     return True
 
@@ -105,8 +147,7 @@ def startoperational():
         after = dict([(f, None) for f in os.listdir(path_to_watch)])
         newfile = [f for f in after if not f in before]
         if newfile:
-            if readfile(newfile, name, eqtime, lat, long, depth, magnitute):
-                if newalertcheck(filelist, newfile):
+            if newalert(newfile, name, eqtime, lat, long, depth, magnitute):
                     print "new alert: ", ", ".join(newfile)
                     start(newfile)
         before = after
