@@ -2,6 +2,7 @@ __author__ = 'Steven Effland'
 import os.path
 import time
 import ConfigParser
+import psutil
 
 #Built in config funct
 def ConfigSectionMap(section):
@@ -17,10 +18,19 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
-def start(argument):
-    print "Starting fortran program with ", ": ".join(argument)
+def start(filename):
+    print "Starting fortran program with ", ": ".join(filename)
     #TODO insert fortran argument here
-
+    #os.system("cd " + filename + "/")
+    #rm set_loop_parameters.pro
+    #rm *event.txt
+    #rm gnss_request.txt
+    #rm *_message
+    #rm *_solution_pars.dat
+    # rm timeseries/*.dat
+    # gnss_server < gnss_server_ts.pro > gnss_server.lis | grep 'Request detected' gnss_server.lis &
+    # geqdis < geqdis_operational.pro > geqdis.lis | grep 'Displacement field available' geqdis.lis &
+    # earthquake < earthquake_$1.pro > earthquake.lis | grep 'Event detected' earthquake.lis &
 
 def newalertcheck(list, new):
     test = new[0]
@@ -57,13 +67,16 @@ def startresearch():
     if (end - start) > maxprocnum:
         print("Too many files to proccess")
     elif (end - start) < maxprocnum:
-        print("Starting fortran program from file:"), start, ("to"), end
+        print("Starting fortran program from file:"), str(start) + "_alert.txt", ("to"), str(end) + "_alert.txt"
 
 #Config file setup
 Config = ConfigParser.ConfigParser()
 configfile = "C:\Users\seffl_000\Documents\Message_Reader\config.ini"
 Config.read(configfile)
 
+#gets cpu percentage
+#Use to monitor cpu consumption
+print(psutil.cpu_percent(interval=1))
 
 mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
 if mode == "O" or mode == "o":
