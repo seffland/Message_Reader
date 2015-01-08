@@ -18,8 +18,17 @@ def ConfigSectionMap(section):
             dict1[option] = None
     return dict1
 
+def checkCPU(baseCPU):
+    runningCPU = psutil.cpu_percent(interval = 1)
+    proccessCPU = runningCPU - baseCPU
+    if runningCPU+proccessCPU<100:
+        return True
+    else:
+        return False
+
 def start(filename):
     print "Starting fortran program with ", ": ".join(filename)
+    baseCPU = psutil.cpu_percent(interval = 1)
     #TODO insert fortran argument here
     #os.system("cd " + filename + "/")
     #rm set_loop_parameters.pro
@@ -31,6 +40,8 @@ def start(filename):
     # gnss_server < gnss_server_ts.pro > gnss_server.lis | grep 'Request detected' gnss_server.lis &
     # geqdis < geqdis_operational.pro > geqdis.lis | grep 'Displacement field available' geqdis.lis &
     # earthquake < earthquake_$1.pro > earthquake.lis | grep 'Event detected' earthquake.lis &
+    if checkCPU(baseCPU) == True:
+        print("I Can Start Another Process")
 
 def newalertcheck(list, new):
     test = new[0]
