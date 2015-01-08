@@ -31,15 +31,15 @@ def start(filename):
     baseCPU = psutil.cpu_percent(interval = 1)
     #TODO insert fortran argument here
     #os.system("cd " + filename + "/")
-    #rm set_loop_parameters.pro
-    #rm *event.txt
-    #rm gnss_request.txt
-    #rm *_message
-    #rm *_solution_pars.dat
-    # rm timeseries/*.dat
-    # gnss_server < gnss_server_ts.pro > gnss_server.lis | grep 'Request detected' gnss_server.lis &
-    # geqdis < geqdis_operational.pro > geqdis.lis | grep 'Displacement field available' geqdis.lis &
-    # earthquake < earthquake_$1.pro > earthquake.lis | grep 'Event detected' earthquake.lis &
+    #os.system(rm set_loop_parameters.pro)
+    #os.system(rm *event.txt)
+    #os.system(rm gnss_request.txt)
+    #os.system(rm *_message)
+    #os.system(rm *_solution_pars.dat)
+    #os.system(rm timeseries/*.dat)
+    #os.system(gnss_server < gnss_server_ts.pro > gnss_server.lis | grep 'Request detected' gnss_server.lis &)
+    #os.system(geqdis < geqdis_operational.pro > geqdis.lis | grep 'Displacement field available' geqdis.lis &)
+    #os.system(earthquake < earthquake_$1.pro > earthquake.lis | grep 'Event detected' earthquake.lis &)
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
@@ -82,12 +82,12 @@ def startresearch():
 
 #Config file setup
 Config = ConfigParser.ConfigParser()
-configfile = "C:\Users\seffl_000\Documents\Message_Reader\config.ini"
+configfile = "/home/seffland/config.ini"
 Config.read(configfile)
 
 #gets cpu percentage
 #Use to monitor cpu consumption
-print(psutil.cpu_percent(interval=1))
+	#print(psutil.cpu_percent(interval=1))
 
 mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
 if mode == "O" or mode == "o":
@@ -99,6 +99,5 @@ if mode == "R" or mode == "r":
 else:
     print "Please input valid mode..."
     mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
-
 
 
