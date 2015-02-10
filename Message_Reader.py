@@ -30,20 +30,13 @@ def checkCPU(baseCPU):
         return False
 
 
-def start(filename):
+def start(filename, dirname):
     print "Starting fortran program with ", ": ".join(filename)
     baseCPU = psutil.cpu_percent(interval=1)
     # TODO insert fortran argument here
-    # os.system("cd " + filename + "/")
-    #os.system(rm set_loop_parameters.pro)
-    #os.system(rm *event.txt)
-    #os.system(rm gnss_request.txt)
-    #os.system(rm *_message)
-    #os.system(rm *_solution_pars.dat)
-    #os.system(rm timeseries/*.dat)
-    #os.system(gnss_server < gnss_server_ts.pro > gnss_server.lis | grep 'Request detected' gnss_server.lis &)
-    #os.system(geqdis < geqdis_operational.pro > geqdis.lis | grep 'Displacement field available' geqdis.lis &)
-    #os.system(earthquake < earthquake_$1.pro > earthquake.lis | grep 'Event detected' earthquake.lis &)
+    #os.system("mkdir " + dirname)
+    #os.system("cd " + filename + "/")
+    #os.system("new_process")
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
@@ -149,7 +142,7 @@ def startoperational():
         if newfile:
             if newalert(newfile, name, eqtime, lat, long, depth, magnitute):
                     print "new alert: ", ", ".join(newfile)
-                    start(newfile)
+                    start(newfile, name[-1])
         before = after
 
 
