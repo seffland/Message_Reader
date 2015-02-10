@@ -30,13 +30,13 @@ def checkCPU(baseCPU):
         return False
 
 
-def start(filename, dirname):
-    print "Starting fortran program with ", ": ".join(filename)
+def start(dirname):
+    print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
     # TODO insert fortran argument here
-    #os.system("mkdir " + dirname)
-    #os.system("cd " + filename + "/")
-    #os.system("new_process")
+    os.system("mkdir " + dirname)
+    os.system("cd " + dirname + "/")
+    os.system("new_process")
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
@@ -74,11 +74,9 @@ def newalert(filename, name, eqtime, lat, long, depth, magnitute):
     junk = f.readline()
 
     newname = f.readline()
-    newname = newname[12:]
+    newname = str(newname[12:])
     if newname in name:
         return False
-    else:
-        name.extend(newname)
 
     temptime = f.readline()
     temptime = temptime[6:]
@@ -102,8 +100,10 @@ def newalert(filename, name, eqtime, lat, long, depth, magnitute):
     newmag = float(tempmag)
 
     if timematch(newtime, eqtime) and latlongmatch(newlat, lat) and latlongmatch(newlong, long) and depthmatch(newdepth, depth):
+        print ("Duplicate Earthquake")
         return False
     else:
+        name.append(newname)
         eqtime.append(newtime)
         lat.append(newlat)
         long.append(newlong)
@@ -142,7 +142,7 @@ def startoperational():
         if newfile:
             if newalert(newfile, name, eqtime, lat, long, depth, magnitute):
                     print "new alert: ", ", ".join(newfile)
-                    start(newfile, name[-1])
+                    start(name[-1])
         before = after
 
 
