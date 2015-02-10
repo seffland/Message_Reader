@@ -30,13 +30,13 @@ def checkCPU(baseCPU):
         return False
 
 
-def start(dirname):
+def start(alertname, dirname):
     print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
     # TODO insert fortran argument here
     os.system("mkdir " + dirname)
     os.system("cd " + dirname + "/")
-    os.system("new_process")
+    os.system("new_process " + dirname + alertname)
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
@@ -142,7 +142,7 @@ def startoperational():
         if newfile:
             if newalert(newfile, name, eqtime, lat, long, depth, magnitute):
                     print "new alert: ", ", ".join(newfile)
-                    start(name[-1])
+                    start(newfile, name[-1])
         before = after
 
 
