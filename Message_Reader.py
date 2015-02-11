@@ -1,3 +1,4 @@
+#!/usr/bin/python
 __author__ = 'Steven Effland'
 import os.path
 import time
@@ -36,7 +37,7 @@ def start(alertname, dirname):
     # TODO insert fortran argument here
     os.system("mkdir " + dirname)
     os.system("cd " + dirname + "/")
-    os.system("new_process " + dirname + alertname)
+    os.system("new_process " + str(dirname) + str(alertname))
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
@@ -157,22 +158,23 @@ def startresearch():
     elif (end - start) < maxprocnum:
         print("Starting fortran program from file:"), str(start) + "_alert.txt", ("to"), str(end) + "_alert.txt"
 
+def adddata():
+    return
+
 # Config file setup
 Config = ConfigParser.ConfigParser()
 configfile = "/home/seffland/config.ini"
 Config.read(configfile)
 
-# gets cpu percentage
-#Use to monitor cpu consumption
-#print(psutil.cpu_percent(interval=1))
-
-mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
+mode = raw_input("Mode to start in: [O]perational, [R]esearch, or [A]dd Earthquakes...")
 if mode == "O" or mode == "o":
     print("Operational mode running...")
     startoperational()
 if mode == "R" or mode == "r":
     print("Starting research mode...")
     startresearch()
+if mode == "A" or mode == "a":
+    adddata()
 else:
     print "Please input valid mode..."
     mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
