@@ -6,6 +6,7 @@ import ConfigParser
 import psutil
 import datetime
 import math
+import Update_PHP
 
 # Built in config funct
 def ConfigSectionMap(section):
@@ -34,15 +35,18 @@ def checkCPU(baseCPU):
 def updatePHP(alertname, dirname):
     print "updating php files..."
     #TODO update php
+    os.system("update_web " + dirname + ConfigSectionMap("File Options")['web_dir'])
+    return
 
 
 def start(alertname, dirname):
     print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
+    #Create dirs
     os.system("mkdir " + "/home/tew_root/" + dirname)
     os.system("mkdir " + "/home/tew_root/" + dirname + "models")
     os.system("mkdir " + "/home/tew_root/" + dirname + "timeseries")
-
+    #Start new_process
     os.system("new_process " + str(dirname) + " " + str(alertname))
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
