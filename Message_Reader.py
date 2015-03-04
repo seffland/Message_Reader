@@ -42,20 +42,25 @@ def updatePHP(alertname, dirname):
 def start(alertname, dirname):
     print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
+
+    #Strip extra chars
+    earthquakename, junk1, junk2 = dirname.partition(" ")
+
     #Create dirs
-    os.system("mkdir " + "/home/tew_root/" + dirname)
-    os.system("mkdir " + "/home/tew_root/" + dirname + "models")
-    os.system("mkdir " + "/home/tew_root/" + dirname + "timeseries")
+    os.system("mkdir /home/tew_root/" + earthquakename)
+    os.chdir("/home/tew_root/" + earthquakename)
+    os.system("mkdir models")
+    os.system("mkdir timeseries")
     #Start new_process
-    os.system("new_process " + str(dirname) + " " + str(alertname))
+    os.system("new_process " + str(earthquakename) + " " + str(alertname))
     if checkCPU(baseCPU) == True:
         print("I Can Start Another Process")
 
-    while not os.path.exists("/home/tew_root/" + dirname + "/" + dirname + ".php"):
-        time.sleep(10)
+    #while not os.path.exists("/home/tew_root/" + dirname + "/" + dirname + ".php"):
+    #    time.sleep(10)
 
-    if os.path.isfile("/home/tew_root/" + dirname + "/" + dirname + ".php"):
-        updatePHP(alertname, dirname)
+    #if os.path.isfile("/home/tew_root/" + dirname + "/" + dirname + ".php"):
+    updatePHP(alertname, dirname)
 
     return
 
