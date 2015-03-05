@@ -6,7 +6,10 @@ import ConfigParser
 import psutil
 import datetime
 import math
-import Update_PHP
+from Update_PHP import llupdater
+from Update_PHP import equpdater
+
+timeholder = ""
 
 # Built in config funct
 def ConfigSectionMap(section):
@@ -32,14 +35,15 @@ def checkCPU(baseCPU):
         return False
 
 
-def updatePHP(alertname, dirname):
-    print "updating php files..."
-    #TODO update php
-    os.system("update_web " + dirname + ConfigSectionMap("File Options")['web_dir'])
+def updatePHP(alertname, earthquakename, date):
+    print "Updating php files..."
+    os.system("update_web " + earthquakename + ConfigSectionMap("File Options")['web_dir'])
+    llupdater(earthquakename, date)
+    equpdater(earthquakename)
     return
 
 
-def start(alertname, dirname):
+def start(alertname, dirname, date):
     print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
 
@@ -53,14 +57,9 @@ def start(alertname, dirname):
     os.system("mkdir timeseries")
     #Start new_process
     os.system("new_process " + str(earthquakename) + " " + str(alertname))
-    if checkCPU(baseCPU) == True:
-        print("I Can Start Another Process")
 
-    #while not os.path.exists("/home/tew_root/" + dirname + "/" + dirname + ".php"):
-    #    time.sleep(10)
-
-    #if os.path.isfile("/home/tew_root/" + dirname + "/" + dirname + ".php"):
-    updatePHP(alertname, dirname)
+    #Update the PHP files
+    updatePHP(alertname, earthquakename, date)
 
     return
 
@@ -86,11 +85,13 @@ def latlongmatch(newlatlong, latlonglist):
             return True
     return False
 
+
 def depthmatch(newdepth, depthlist):
     for item in depthlist:
         if (abs(item - newdepth) < float(ConfigSectionMap("Earthquake Options")['delta_depth'])):
             return True
     return False
+
 
 def newalert(filename, name, eqtime, lat, long, depth, magnitute):
     file = ''.join(filename)
@@ -158,6 +159,7 @@ def startoperational():
     depth = []
     magnitute =[]
 
+    #Waits for new file in path
     before = dict([(f, None) for f in os.listdir(path_to_watch)])
     while 1:
         time.sleep(10)
@@ -166,7 +168,7 @@ def startoperational():
         if newfile:
             if newalert(newfile, name, eqtime, lat, long, depth, magnitute):
                     print "new alert: ", ", ".join(newfile)
-                    start(newfile, name[-1])
+                    start(newfile, name[-1], str(eqtime[-1]))
         before = after
 
 
@@ -181,25 +183,20 @@ def startresearch():
     elif (end - start) < maxprocnum:
         print("Starting fortran program from file:"), str(start) + "_alert.txt", ("to"), str(end) + "_alert.txt"
 
-def adddata():
-    return
 
 # Config file setup
 Config = ConfigParser.ConfigParser()
 configfile = "/home/seffland/config.ini"
 Config.read(configfile)
 
-mode = raw_input("Mode to start in: [O]perational, [R]esearch, or [A]dd Earthquakes...")
+mode = raw_input("Mode to start in: [O]perational or [R]esearch")
 if mode == "O" or mode == "o":
     print("Operational mode running...")
     startoperational()
 if mode == "R" or mode == "r":
     print("Starting research mode...")
     startresearch()
-if mode == "A" or mode == "a":
-    adddata()
 else:
     print "Please input valid mode..."
-    mode = raw_input("Mode to start in: [O]perational or [R]esearch...")
 
 
