@@ -7,7 +7,7 @@ def llupdater(eqname, date):
     with open('/home/webwork/mari/GREAT/solutions/local_links_operational.php', 'r') as file:
         lines = file.readlines()
 
-    line1 = ('<a href="' + eqname + '".php" target="main">' + date + '</a>\n')
+    line1 = ('<a href="' + eqname + '".php" target="main">' + str(date) + '</a>\n')
     line2 = '</td></tr><tr><td class="menuele">\n'
     final = line1 + line2
     index = 2

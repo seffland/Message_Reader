@@ -6,10 +6,10 @@ import ConfigParser
 import psutil
 import datetime
 import math
+import linecache
 from Update_PHP import llupdater
 from Update_PHP import equpdater
 
-timeholder = ""
 
 # Built in config funct
 def ConfigSectionMap(section):
@@ -43,6 +43,14 @@ def updatePHP(alertname, earthquakename, date):
     return
 
 
+def researchupdatePHP(alertname, earthquakename, date):
+    print "Updating php files..."
+    os.system("researchupdate_web " + earthquakename + ConfigSectionMap("File Options")['web_dir'])
+    llupdater(earthquakename, date)
+    equpdater(earthquakename)
+    return
+
+
 def start(alertname, dirname, date):
     print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
@@ -63,6 +71,26 @@ def start(alertname, dirname, date):
 
     return
 
+
+def researchstart(alertname, dirname, date):
+    print "Starting fortran program with " + dirname
+    baseCPU = psutil.cpu_percent(interval=1)
+
+    #Strip extra chars
+    earthquakename, junk1, junk2 = dirname.partition(" ")
+
+    #Create dirs
+    os.system("mkdir /home/tew_root/" + earthquakename)
+    os.chdir("/home/tew_root/" + earthquakename)
+    os.system("mkdir models")
+    os.system("mkdir timeseries")
+    #Start new_process
+    os.system("researchnew_process " + str(earthquakename) + " " + str(alertname))
+
+    #Update the PHP files
+    researchupdatePHP(alertname, earthquakename, date)
+
+    return
 
 def newalertcheck(list, new):
     test = new[0]
@@ -172,7 +200,7 @@ def startoperational():
         before = after
 
 
-def startresearch():
+def research():
     maxprocnum = int(ConfigSectionMap("File Options")['maxfilesin'])
     print ("Max number of alerts = "), maxprocnum
 
@@ -182,6 +210,25 @@ def startresearch():
         print("Too many files to proccess")
     elif (end - start) < maxprocnum:
         print("Starting fortran program from file:"), str(start) + "_alert.txt", ("to"), str(end) + "_alert.txt"
+        for x in range(start, end):
+            aname = str(x) + "_alert.txt"
+            fpath = ConfigSectionMap("File Options")['path'] + "/" + aname
+            f = open(fpath)
+            junk = f.readline()
+
+            #Get eqname
+            newname = f.readline()
+            newname = str(newname[12:])
+            print newname
+
+            #Get Date From Files
+            date = linecache.getline(fpath, 3)
+            date = date[6:]
+            year, month, day, hour, min, second = date.split("/")
+            newdate = datetime.datetime(int(year), int(month), int(day), int(hour), int(min), int(second))
+            print newdate
+
+            researchstart(aname, newname, newdate)
 
 
 # Config file setup
@@ -195,7 +242,7 @@ if mode == "O" or mode == "o":
     startoperational()
 if mode == "R" or mode == "r":
     print("Starting research mode...")
-    startresearch()
+    research()
 else:
     print "Please input valid mode..."
 
