@@ -247,7 +247,7 @@ def research():
 
 # Config file setup
 Config = ConfigParser.ConfigParser()
-configfile = "/home/seffland/config.ini"
+configfile = "config.ini"
 Config.read(configfile)
 
 mode = raw_input("Mode to start in: [O]perational or [R]esearch")
