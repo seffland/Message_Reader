@@ -51,6 +51,18 @@ def researchupdatePHP(alertname, earthquakename, date):
     return
 
 
+def setparameters():
+    filename = "set_parameters.pro"
+    target = open(filename, 'a')
+    target.write("sampling " + ConfigSectionMap("Set Parameters Options")['sampling'])
+    target.write("network " + ConfigSectionMap("Set Parameters Options")['network'])
+    target.write("station_dir " + ConfigSectionMap("Set Parameters Options")['station_dir'])
+    target.write("fp_dir " + ConfigSectionMap("Set Parameters Options")['fp_dir'])
+    target.write("model_dir " + ConfigSectionMap("Set Parameters Options")['model_dir'])
+    target.write("ts_dir " + ConfigSectionMap("Set Parameters Options")['ts_dir'])
+    target.close()
+    return
+
 def start(alertname, dirname, date):
     print "Starting fortran program with " + dirname
     baseCPU = psutil.cpu_percent(interval=1)
@@ -59,8 +71,9 @@ def start(alertname, dirname, date):
     earthquakename, junk1, junk2 = dirname.partition(" ")
 
     #Create dirs
-    os.system("mkdir /home/tew_root/" + earthquakename)
-    os.chdir("/home/tew_root/" + earthquakename)
+    os.system("mkdir " + earthquakename)
+    os.chdir(earthquakename)
+    setparameters()
     os.system("mkdir models")
     os.system("mkdir timeseries")
     #Start new_process
@@ -80,8 +93,9 @@ def researchstart(alertname, dirname, date):
     earthquakename, junk1, junk2 = dirname.partition(" ")
 
     #Create dirs
-    os.system("mkdir /home/tew_root/" + earthquakename)
-    os.chdir("/home/tew_root/" + earthquakename)
+    os.system("mkdir " + earthquakename)
+    os.chdir(earthquakename)
+    setparameters()
     os.system("mkdir models")
     os.system("mkdir timeseries")
     #Start new_process
